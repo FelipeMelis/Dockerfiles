@@ -5,7 +5,7 @@ FROM ubuntu:17.04
 RUN apt-get update
 RUN apt-get -y install wget
 RUN apt-get -y install python2.7
-RUN apt-get -y install python-pip 
+RUN apt-get -y install python-pip
 RUN apt-get install -y unzip
 RUN apt-get install -y python3-setuptools
 RUN easy_install3 pip
@@ -24,11 +24,11 @@ RUN apt-get install -y biom-format-tools
 # Installing Fastx toolkit
 RUN apt-get install -y fastx-toolkit
 
-# Installing pipits-1.4.2
+# Installing pipits-1.5.0
 WORKDIR /root
-RUN wget https://github.com/hsgweon/pipits/archive/1.4.2.tar.gz
-RUN tar -xzvf 1.4.2.tar.gz
-WORKDIR /root/pipits-1.4.2
+RUN wget https://github.com/hsgweon/pipits/archive/1.5.0.tar.gz
+RUN tar -xzvf 1.5.0.tar.gz
+WORKDIR /root/pipits-1.5.0
 RUN python setup.py clean --all
 RUN python setup.py install --prefix=/root/pipits
 
@@ -46,10 +46,10 @@ RUN wget https://github.com/torognes/vsearch/releases/download/v2.1.2/vsearch-2.
 RUN tar -xvzf vsearch-2.1.2-linux-x86_64.tar.gz
 RUN ln -s /root/pipits/vsearch-2.1.2-linux-x86_64/bin/vsearch bin/vsearch
 
-# Installing PEAR
-RUN wget http://sco.h-its.org/exelixis/web/software/pear/files/pear-0.9.10-bin-64.tar.gz
-RUN tar xvfz pear-0.9.10-bin-64.tar.gz
-RUN ln -s /root/pipits/pear-0.9.10-bin-64/pear-0.9.10-bin-64 bin/pear
+# [Deprecated] Installing PEAR
+# RUN wget http://sco.h-its.org/exelixis/web/software/pear/files/pear-0.9.10-bin-64.tar.gz
+# RUN tar xvfz pear-0.9.10-bin-64.tar.gz
+# RUN ln -s /root/pipits/pear-0.9.10-bin-64/pear-0.9.10-bin-64 bin/pear
 
 # Installing RDP Classifier 
 RUN wget https://sourceforge.net/projects/rdp-classifier/files/rdp-classifier/rdp_classifier_2.12.zip
@@ -71,7 +71,6 @@ RUN wget https://unite.ut.ee/sh_files/uchime_reference_dataset_01.01.2016.zip
 RUN unzip uchime_reference_dataset_01.01.2016.zip
 
 # Set PATH and Environment Variable
-
 WORKDIR /root
 RUN echo "export PATH=/root/pipits/bin:$PATH" >> .bashrc
 RUN echo "export PYTHONPATH=/root/pipits/lib/python2.7/site-packages:$PYTHONPATH" >> .bashrc
@@ -85,3 +84,12 @@ RUN pip2 install configparser
 RUN apt-get install -y python-numpy
 # RUN export LC_ALL=C.UTF-8
 # RUN export LANG=C.UTF-8
+
+# Adding the last things
+WORKDIR /root
+RUN echo 'cd $HOME/pipits/ITSx_1.0.11/ITSx_db/HMMs' >> final_tweaks.sh
+RUN echo 'rm -f *.hmm.*' >> final_tweaks.sh
+RUN echo 'echo *.hmm | xargs -n1 hmmpress' >> final_tweaks.sh
+RUN echo 'export LC_ALL=C.UTF-8' >> final_tweaks.sh
+RUN echo 'export LANG=C.UTF-8' >> final_tweaks.sh
+RUN sh final_tweaks.sh
